@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home_instruktur"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/navigation_dashboard_instruktur"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="@string/title_dashboard" />
+
+    <item
+        android:id="@+id/navigation_izin_instruktur"
+        android:icon="@drawable/baseline_sticky_note_2_24"
+        android:title="Izin Instruktur" />
+
+    <item
+        android:id="@+id/navigation_profile_instruktur"
+        android:icon="@drawable/baseline_account_circle_24"
+        android:title="Profile" />
+</menu>
