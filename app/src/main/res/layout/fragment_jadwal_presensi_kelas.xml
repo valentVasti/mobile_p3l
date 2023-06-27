@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".menuMember.bookingKelas.BookingKelasFragment">
+    tools:context=".menuInstruktur.jadwalPresensiKelas.JadwalPresensiKelasFragment">
 
     <SearchView
-        android:id="@+id/sv_booking_kelas"
+        android:id="@+id/sv_jadwal_presensi_kelas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/sr_booking_kelas"
+        android:id="@+id/sr_kelas_instruktur"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
@@ -26,31 +26,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sv_booking_kelas"
+        app:layout_constraintTop_toBottomOf="@id/sv_jadwal_presensi_kelas"
         app:layout_constraintVertical_bias="0.0">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_booking_kelas"
+            android:id="@+id/rv_kelas_instruktur"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingHorizontal="12dp"
-            android:paddingBottom="88dp"
-            tools:listitem="@layout/item_booking_kelas"/>
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="70dp"
+            tools:listitem="@layout/item_kelas_instruktur"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_add_booking_kelas"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_post_add_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.88"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.83" />
 
     <include
         android:id="@+id/layout_loading"

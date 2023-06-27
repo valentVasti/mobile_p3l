@@ -17,6 +17,12 @@
         android:theme="@style/Theme.Mobile_p3l"
         tools:targetApi="30">
         <activity
+            android:name=".PresensiKelasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddBookingKelasActivity"
+            android:exported="false" />
+        <activity
             android:name=".DepositKelasActivity"
             android:exported="false" />
         <activity

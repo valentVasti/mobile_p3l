@@ -1,7 +1,7 @@
 package server.model
 
 class Member(
-    var id_memb: String,
+    var id_member: String,
     var nama: String,
     var no_telp: String,
     var tgl_lahir: String,

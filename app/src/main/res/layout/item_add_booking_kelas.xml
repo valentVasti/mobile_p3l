@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cv_booking_kelas"
+    android:id="@+id/cv_add_booking_kelas"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="10dp"
@@ -25,7 +25,7 @@
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/tv_nama_kelas"
+                android:id="@+id/tv_nama_kelas_add_booking"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                 android:text="Nama Kelas"/>
 
             <TextView
-                android:id="@+id/tv_nama_instruktur"
+                android:id="@+id/tv_nama_instruktur_add_booking"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,17 +46,27 @@
                 android:text="Nama Instruktur"/>
 
             <TextView
-                android:id="@+id/tv_hari_tgl_kelas_harian_booking"
+                android:id="@+id/tv_hari_kelas_harian_add_booking"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Hari Tanggal Booking Kelas"/>
+                android:text="Hari Booking Kelas"/>
 
             <TextView
-                android:id="@+id/tv_jam_kelas_booking"
+                android:id="@+id/tv_tanggal_kelas_add_booking"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Tanggal Kelas Booking"/>
+
+            <TextView
+                android:id="@+id/tv_jam_kelas_add_booking"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,7 +77,7 @@
                 />
 
             <TextView
-                android:id="@+id/tv_status_booking"
+                android:id="@+id/tv_status_add_booking"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -75,21 +85,13 @@
                 android:layout_weight="1"
                 android:text="Status Booking"/>
 
-            <TextView
-                android:id="@+id/tv_pengajuan_booking"
-                style="@style/TextAppearance.MaterialComponents.Body2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
-                android:text="Hari Tanggal Pengajuan Booking"/>
 
             <Button
-                android:id="@+id/button_cancel_booking"
+                android:id="@+id/button_add_booking"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:text="BATAL BOOKING"
-                android:backgroundTint="#d90429"
+                android:text="BOOKING KELAS"
+                android:backgroundTint="#4c956c"
                 android:textSize="15sp"
                 android:layout_marginTop="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"

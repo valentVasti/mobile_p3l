@@ -24,8 +24,6 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeMemberBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
-        textView.setText("Home Fragment Member: ")
         return root
     }
 

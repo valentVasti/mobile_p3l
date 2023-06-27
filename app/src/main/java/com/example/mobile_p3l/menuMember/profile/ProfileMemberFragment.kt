@@ -15,6 +15,7 @@ import com.android.volley.toolbox.Volley
 import com.example.mobile_p3l.DepositKelasActivity
 import com.example.mobile_p3l.databinding.FragmentProfileMemberBinding
 import com.google.gson.Gson
+import login.LoginActivity
 import org.json.JSONObject
 import server.api.MemberApi
 import server.model.Member
@@ -54,6 +55,17 @@ class ProfileMemberFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("id_member", id_user)
             val move = Intent(context, DepositKelasActivity::class.java)
+            move.putExtras(bundle)
+            startActivity(move)
+        }
+
+        val btnLogout = binding.buttonLogout
+
+        btnLogout.setOnClickListener{
+            val bundle = Bundle()
+            bundle.clear()
+
+            val move = Intent(context, LoginActivity::class.java)
             move.putExtras(bundle)
             startActivity(move)
         }

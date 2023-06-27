@@ -41,9 +41,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#E8E8E8"
+
                 android:hint="Username"
                 android:inputType="text"
-                android:textColor="#8C8C8C"
                 tools:visibility="visible" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -59,6 +59,8 @@
                 android:layout_height="wrap_content"
                 android:background="#E8E8E8"
                 android:hint="Password"
+                android:inputType="textPassword"
+
                 tools:visibility="visible" />
         </com.google.android.material.textfield.TextInputLayout>
 

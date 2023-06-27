@@ -1,10 +1,10 @@
-package com.example.mobile_p3l.menuMO.presensiInstruktur
+package com.example.mobile_p3l.menuInstruktur.jadwalPresensiKelas
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +14,10 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.mobile_p3l.BookingKelasAdapter
 import com.example.mobile_p3l.JadwalHarianAdapter
+import com.example.mobile_p3l.JadwalPresensiKelasAdapter
+import com.example.mobile_p3l.databinding.FragmentJadwalPresensiKelasBinding
 import com.example.mobile_p3l.databinding.FragmentPresensiInstrukturBinding
 import com.google.gson.Gson
 import org.json.JSONObject
@@ -25,13 +28,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class presensiInstrukturFragment : Fragment(), JadwalHarianAdapter.UpdateJamSelesaiListener {
+class JadwalPresensiKelasFragment : Fragment() {
 
-    private var _binding: FragmentPresensiInstrukturBinding? = null
-    private var srPresensiInstruktur: SwipeRefreshLayout? = null
-    private var adapter: JadwalHarianAdapter? = null
+    private var srKelasInstruktur: SwipeRefreshLayout? = null
+    private var svKelasInstruktur: SearchView? = null
+    private var adapter: JadwalPresensiKelasAdapter? = null
     private var queue: RequestQueue? = null
+    private var _binding: FragmentJadwalPresensiKelasBinding? = null
 
+    // This property is only valid between onCreateView and
+    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -39,8 +45,9 @@ class presensiInstrukturFragment : Fragment(), JadwalHarianAdapter.UpdateJamSele
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentPresensiInstrukturBinding.inflate(inflater, container, false)
+        _binding = FragmentJadwalPresensiKelasBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
         return root
     }
 
@@ -48,39 +55,50 @@ class presensiInstrukturFragment : Fragment(), JadwalHarianAdapter.UpdateJamSele
         super.onViewCreated(view, savedInstanceState)
 
         queue = Volley.newRequestQueue(context)
-        srPresensiInstruktur = binding.srJadwalHarian
+        srKelasInstruktur = binding.srKelasInstruktur
+        svKelasInstruktur = binding.svJadwalPresensiKelas
 
-//        val bundle = intent.extras
-//        val id_instruktur = bundle?.getString("id_instruktur")
+        val id_instruktur = arguments?.getString("id_user")
 
-        srPresensiInstruktur?.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener { allJadwalHarian() })
+        srKelasInstruktur?.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener { allJadwalKelasInstruktur(id_instruktur!!) })
+        svKelasInstruktur?.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(s: String): Boolean{
+                return false
+            }
 
-        allJadwalHarian()
+            override fun onQueryTextChange(s: String?): Boolean {
+                adapter!!.filter.filter(s)
+                return false
+            }
+        })
+
+        val rvProduk = binding.rvKelasInstruktur
+        adapter = JadwalPresensiKelasAdapter(ArrayList(), context)
+        rvProduk.layoutManager = LinearLayoutManager(context)
+        rvProduk.adapter = adapter
+        allJadwalKelasInstruktur(id_instruktur!!)
 
     }
 
-    private fun allJadwalHarian(){
+    private fun allJadwalKelasInstruktur(id_instruktur: String){
         val currentDate: Date = Date()
         val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate: String = dateFormat.format(currentDate)
 
-        srPresensiInstruktur!!.isRefreshing = true
+        srKelasInstruktur!!.isRefreshing = true
         val stringRequest: StringRequest = object :
-            StringRequest(Method.GET, JadwalHarianApi.GET_BY_DATE + formattedDate, Response.Listener { response ->
+            StringRequest(Method.GET, JadwalHarianApi.GET_KELAS_INSTRUKTUR_TODAY + id_instruktur + "/" + formattedDate, Response.Listener { response ->
                 val gson = Gson()
                 val jsonObject = JSONObject(response)
-                val jadwalHarian = gson.fromJson(
+                val jadwalKelasInstruktur = gson.fromJson(
                     jsonObject.getJSONArray("data").toString(), Array<JadwalHarian>::class.java
                 )
 
-                val rvProduk = binding.rvJadwalHarian
-                adapter = JadwalHarianAdapter(jadwalHarian.toList(), context, this)
-                rvProduk.layoutManager = LinearLayoutManager(context)
-                rvProduk.adapter = adapter
+                adapter!!.setJadwalPresensiKelasList(jadwalKelasInstruktur)
+                adapter!!.filter.filter(svKelasInstruktur!!.query)
+                srKelasInstruktur!!.isRefreshing = false
 
-                srPresensiInstruktur!!.isRefreshing = false
-
-                if(!jadwalHarian.isEmpty()) {
+                if(!jadwalKelasInstruktur.isEmpty()) {
                     Toast.makeText(
                         context,
                         "Data Jadwal Harian Berhasil Diambil",
@@ -92,7 +110,7 @@ class presensiInstrukturFragment : Fragment(), JadwalHarianAdapter.UpdateJamSele
                         .show()
                 }
             }, Response.ErrorListener { error ->
-                srPresensiInstruktur!!.isRefreshing = false
+                srKelasInstruktur!!.isRefreshing = false
                 try{
                     val responseBody =
                         String(error.networkResponse.data, StandardCharsets.UTF_8)
@@ -119,9 +137,5 @@ class presensiInstrukturFragment : Fragment(), JadwalHarianAdapter.UpdateJamSele
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onButtonClick() {
-        allJadwalHarian()
     }
 }

@@ -4,10 +4,9 @@ import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import com.example.mobile_p3l.databinding.ActivityHomeInstrukturBinding
 import com.example.mobile_p3l.menuInstruktur.home.HomeFragment
-import com.example.mobile_p3l.menuInstruktur.dashboard.DashboardFragment
+import com.example.mobile_p3l.menuInstruktur.jadwalPresensiKelas.JadwalPresensiKelasFragment
 import com.example.mobile_p3l.menuInstruktur.izinInstruktur.izinInstrukturFragment
 import com.example.mobile_p3l.menuInstruktur.profile.ProfileInstrukturFragment
 
@@ -21,7 +20,7 @@ class HomeInstrukturActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val firstFragment = HomeFragment()
-        val secondFragment = DashboardFragment()
+        val secondFragment = JadwalPresensiKelasFragment()
         val thirdFragment = izinInstrukturFragment()
         val fourthFragment = ProfileInstrukturFragment()
 
@@ -36,7 +35,8 @@ class HomeInstrukturActivity : AppCompatActivity() {
         navView.setOnNavigationItemSelectedListener {
             if(it.itemId == R.id.navigation_home_instruktur) {
                 setCurrentFragment(firstFragment)
-            }else if(it.itemId == R.id.navigation_dashboard_instruktur){
+            }else if(it.itemId == R.id.navigation_presensi_kelas){
+                secondFragment.arguments = fragmentBundle
                 setCurrentFragment(secondFragment)
             }else if(it.itemId == R.id.navigation_izin_instruktur) {
                 thirdFragment.arguments = fragmentBundle

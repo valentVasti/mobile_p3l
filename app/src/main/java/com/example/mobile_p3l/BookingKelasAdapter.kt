@@ -1,58 +1,90 @@
 package com.example.mobile_p3l
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.AuthFailureError
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.json.JSONObject
+import server.api.BookingKelasApi
+import server.api.PresensiInstrukturApi
 import server.model.BookingKelas
-import server.model.IzinInstruktur
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 
-class BookingKelasAdapter(private var bookingKelasList: List<BookingKelas>, context: Context?) :
-    RecyclerView.Adapter<IzinInstrukturAdapter.ViewHolder>(), Filterable{
+class BookingKelasAdapter(private var bookingKelasList: List<BookingKelas>, context: Context?, id_member: String, private val listener: CancelBookingKelasListener) :
+    RecyclerView.Adapter<BookingKelasAdapter.ViewHolder>(), Filterable{
 
-    private var filteredIzinInstrukturList: MutableList<IzinInstruktur>
+    private var filteredBookingKelasList: MutableList<BookingKelas>
     private val context: Context
+    private val id_member = id_member
 
     init{
-        filteredIzinInstrukturList = ArrayList(izinInstrukturList)
+        filteredBookingKelasList = ArrayList(bookingKelasList)
         this.context = context!!
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_izin_instruktur, parent, false)
+        val view = inflater.inflate(R.layout.item_booking_kelas, parent, false)
         return ViewHolder(view)
     }
 
     override fun getItemCount(): Int{
-        return filteredIzinInstrukturList.size
+        return filteredBookingKelasList.size
     }
 
-    fun setIzinInstrukturList(izinInstrukturList: Array<IzinInstruktur>){
-        this.izinInstrukturList = izinInstrukturList.toList()
-        filteredIzinInstrukturList = izinInstrukturList.toMutableList()
+    fun setBookingKelasList(bookingKelasList: Array<BookingKelas>){
+        this.bookingKelasList = bookingKelasList.toList()
+        filteredBookingKelasList = bookingKelasList.toMutableList()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val izin_instruktur = filteredIzinInstrukturList[position]
-        holder.tvIdIzin.text = "ID Izin: " + izin_instruktur.id_izin
-        holder.tvIdInstruktur.text = izin_instruktur.id_instruktur
-        holder.tvIdJadwalHarian.text = "ID Jadwal Harian: " + izin_instruktur.id_jadwal_harian
-        holder.tvIdInstrukturPengganti.text = "ID Instruktur Pengganti: " + izin_instruktur.id_instruktur_pengganti
-        holder.tvTanggal.text = "Tanggal Izin Kelas: " + izin_instruktur.tgl_izin
-//        holder.tvStatus.text = izin_instruktur.status_konfirmasi
+        val booking_kelas = filteredBookingKelasList[position]
 
-        if(izin_instruktur.status_konfirmasi == "0"){
-            holder.tvStatus.text = "BELUM DIKONFIRMASI"
-        }else{
-            holder.tvStatus.text = "SUDAH DIKONFIRMASI"
+        holder.tvNamaKelas.text = booking_kelas.jadwal_harian.kelas.nama_kelas
+        holder.tvNamaInstruktrur.text = "Instruktur: " + booking_kelas.jadwal_harian.instruktur.nama
+        holder.tvHariTglBookingKelas.text = booking_kelas.jadwal_harian.hari_kelas_harian + ", " + booking_kelas.tgl_booking_kelas
+        holder.tvJamKelasBooking.text = booking_kelas.jadwal_harian.jam_mulai + " - " + booking_kelas.jadwal_harian.jam_selesai
+        holder.tvStatusBookingKelas.text = booking_kelas.status
+
+        val dateString = booking_kelas.created_at.substring(0, 10)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = dateFormat.parse(dateString)
+
+        val dayOfWeekFormat = SimpleDateFormat("EEEE", Locale("id", "ID"))
+        val hariPengajuanBookingKelas = dayOfWeekFormat.format(date).toString()
+
+        holder.tvHariTglPengajuanBookingKelas.text = "Tanggal Pengajuan: $hariPengajuanBookingKelas, $dateString"
+
+        if(booking_kelas.status.equals("BATAL")){
+            holder.btnCancelBookingKelas.isEnabled = false
+            holder.tvStatusBookingKelas.setTextColor((Color.parseColor("#d00000")))
+        }
+
+        holder.btnCancelBookingKelas.setOnClickListener {
+            val materialAlertDialogBuilder = MaterialAlertDialogBuilder(context)
+            materialAlertDialogBuilder.setTitle("Konfirmasi Batal Kelas")
+                .setMessage("Apakah anda yakin ingin batalkan booking ini?")
+                .setNegativeButton("Tidak", null)
+                .setPositiveButton("Ya"){ _, _ ->
+                    cancelBooking(booking_kelas.jadwal_harian.id_jadwal_harian, id_member, booking_kelas.tgl_booking_kelas)
+                }
+                .show()
         }
     }
 
@@ -60,14 +92,16 @@ class BookingKelasAdapter(private var bookingKelasList: List<BookingKelas>, cont
         return object : Filter(){
             override fun performFiltering(charSequence: CharSequence?): FilterResults {
                 val charSequenceString = charSequence.toString()
-                val filtered: MutableList<IzinInstruktur> = java.util.ArrayList()
+                val filtered: MutableList<BookingKelas> = java.util.ArrayList()
                 if (charSequenceString.isEmpty()){
-                    filtered.addAll(izinInstrukturList)
+                    filtered.addAll(bookingKelasList)
                 }else{
-                    for(izin_instruktur in izinInstrukturList){
-                        if(izin_instruktur.id_izin.lowercase(Locale.getDefault())
+                    for(booking_kelas in bookingKelasList){
+                        if(booking_kelas.jadwal_harian.kelas.nama_kelas.lowercase(Locale.getDefault())
+                                .contains(charSequenceString.lowercase(Locale.getDefault())) ||
+                            booking_kelas.jadwal_harian.hari_kelas_harian.lowercase(Locale.getDefault())
                                 .contains(charSequenceString.lowercase(Locale.getDefault()))
-                        ) filtered.add(izin_instruktur)
+                        ) filtered.add(booking_kelas)
                     }
                 }
                 val filterResults = FilterResults()
@@ -76,8 +110,8 @@ class BookingKelasAdapter(private var bookingKelasList: List<BookingKelas>, cont
             }
 
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
-                filteredIzinInstrukturList.clear()
-                filteredIzinInstrukturList.addAll((filterResults.values as List<IzinInstruktur>))
+                filteredBookingKelasList.clear()
+                filteredBookingKelasList.addAll((filterResults.values as List<BookingKelas>))
                 notifyDataSetChanged()
             }
         }
@@ -85,23 +119,25 @@ class BookingKelasAdapter(private var bookingKelasList: List<BookingKelas>, cont
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
-        var tvIdIzin: TextView
-        var tvIdInstruktur: TextView
-        var tvIdJadwalHarian: TextView
-        var tvIdInstrukturPengganti: TextView
-        var tvTanggal: TextView
-        var tvStatus: TextView
-        var cvIzinInstruktur: CardView
+        var tvNamaKelas: TextView
+        var tvNamaInstruktrur: TextView
+        var tvHariTglBookingKelas: TextView //tanggal kelasnya
+        var tvJamKelasBooking: TextView
+        var tvStatusBookingKelas: TextView
+        var tvHariTglPengajuanBookingKelas : TextView //tanggal pengajuan kelas
+        var btnCancelBookingKelas: Button
 
+        var cvBookingKelas: CardView
 
         init {
-            tvIdIzin = itemView.findViewById(R.id.tv_id_izin_instruktur)
-            tvIdInstruktur = itemView.findViewById(R.id.tv_id_instruktur)
-            tvIdJadwalHarian = itemView.findViewById(R.id.tv_id_jadwal_harian)
-            tvIdInstrukturPengganti = itemView.findViewById(R.id.tv_id_instruktur_pengganti)
-            tvTanggal = itemView.findViewById(R.id.tv_tanggal)
-            tvStatus = itemView.findViewById(R.id.tv_status)
-            cvIzinInstruktur = itemView.findViewById(R.id.cv_izin_instruktur)
+            tvNamaKelas = itemView.findViewById(R.id.tv_nama_kelas)
+            tvNamaInstruktrur = itemView.findViewById(R.id.tv_nama_instruktur)
+            tvHariTglBookingKelas = itemView.findViewById(R.id.tv_hari_tgl_kelas_harian_booking)
+            tvJamKelasBooking = itemView.findViewById(R.id.tv_jam_kelas_booking)
+            tvStatusBookingKelas = itemView.findViewById(R.id.tv_status_booking)
+            tvHariTglPengajuanBookingKelas = itemView.findViewById(R.id.tv_pengajuan_booking)
+            btnCancelBookingKelas = itemView.findViewById(R.id.button_cancel_booking)
+            cvBookingKelas = itemView.findViewById(R.id.cv_booking_kelas)
         }
     }
 
@@ -110,4 +146,47 @@ class BookingKelasAdapter(private var bookingKelasList: List<BookingKelas>, cont
         return format.format(date)
     }
 
+    private fun cancelBooking(id_jadwal_harian: String, id_member: String, tgl_booking_kelas: String){
+        var queue: RequestQueue? = Volley.newRequestQueue(context)
+
+        val stringRequest: StringRequest = object :
+            StringRequest(Method.GET, BookingKelasApi.CANCEL_BOOKING + id_jadwal_harian + "/" + id_member + "/" + tgl_booking_kelas, Response.Listener { response ->
+                val jsonResponse = JSONObject(response)
+                val message = jsonResponse.getString("message")
+
+                if(!message.isEmpty()) {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                        .show()
+                    listener.onButtonClick()
+                }else{
+                    Toast.makeText(context, "Batal booking kelas gagal!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }, Response.ErrorListener { error ->
+                try{
+                    val responseBody =
+                        String(error.networkResponse.data, StandardCharsets.UTF_8)
+                    val errors = JSONObject(responseBody)
+                    Toast.makeText(
+                        context,
+                        errors.getString("message"),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }catch (e: Exception){
+                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                }
+            }) {
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Accept"] = "application/json"
+                return headers
+            }
+        }
+        queue!!.add(stringRequest)
+    }
+
+    interface CancelBookingKelasListener {
+        fun onButtonClick()
+    }
 }

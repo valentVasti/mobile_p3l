@@ -5,7 +5,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.mobile_p3l.databinding.ActivityHomeMemberBinding
-import com.example.mobile_p3l.menuMember.dashboard.DashboardFragment
+import com.example.mobile_p3l.menuMember.historyMember.HistoryMemberFragment
 import com.example.mobile_p3l.menuMember.home.HomeFragment
 import com.example.mobile_p3l.menuMember.bookingKelas.BookingKelasFragment
 import com.example.mobile_p3l.menuMember.profile.ProfileMemberFragment
@@ -20,7 +20,7 @@ class HomeMemberActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val firstFragment = HomeFragment()
-        val secondFragment = DashboardFragment()
+        val secondFragment = HistoryMemberFragment()
         val thirdFragment = BookingKelasFragment()
         val fourthFragment = ProfileMemberFragment()
 
@@ -36,6 +36,7 @@ class HomeMemberActivity : AppCompatActivity() {
             if(it.itemId == R.id.navigation_home_member) {
                 setCurrentFragment(firstFragment)
             }else if(it.itemId == R.id.navigation_dashboard_member){
+                secondFragment.arguments = fragmentBundle
                 setCurrentFragment(secondFragment)
             }else if(it.itemId == R.id.navigation_booking_kelas_member) {
                 thirdFragment.arguments = fragmentBundle

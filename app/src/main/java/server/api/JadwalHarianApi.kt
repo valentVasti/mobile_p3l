@@ -6,5 +6,6 @@ class JadwalHarianApi {
 
         val GET_ALL = BASE_URL + "jadwalHarian"
         val GET_BY_DATE = BASE_URL + "jadwalHarianByDate/"
+        val GET_KELAS_INSTRUKTUR_TODAY = BASE_URL + "jadwalKelasInstrukturToday/"
     }
 }

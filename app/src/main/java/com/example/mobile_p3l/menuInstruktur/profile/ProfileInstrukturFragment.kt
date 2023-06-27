@@ -1,5 +1,6 @@
 package com.example.mobile_p3l.menuInstruktur.profile
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,8 +12,10 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.mobile_p3l.DepositKelasActivity
 import com.example.mobile_p3l.databinding.FragmentProfileInstrukturBinding
 import com.google.gson.Gson
+import login.LoginActivity
 import org.json.JSONObject
 import server.api.InstrukturApi
 import server.model.Instruktur
@@ -45,6 +48,17 @@ class ProfileInstrukturFragment : Fragment() {
 
 //        val bundle = intent.extras
 //        val id_instruktur = bundle?.getString("id_instruktur")
+
+        val btnLogout = binding.buttonLogout
+
+        btnLogout.setOnClickListener{
+            val bundle = Bundle()
+            bundle.clear()
+
+            val move = Intent(context, LoginActivity::class.java)
+            move.putExtras(bundle)
+            startActivity(move)
+        }
 
         val stringRequest: StringRequest = object :
             StringRequest(Method.GET, InstrukturApi.GET_BY_ID + id_instruktur, Response.Listener { response ->
